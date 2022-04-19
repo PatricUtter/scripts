@@ -1,0 +1,96 @@
+#! /usr/bin/bash
+
+## Simple TODO script
+
+TODO_FILE=$HOME/scripts/todos.txt
+
+if [ ! -f $TODO_FILE ]; then
+    touch $TODO_FILE
+fi
+
+
+## Base functions
+create_todo() {
+    local MSG=$1
+    BIGGEST_ID=0;
+    local TODOS=$(cat $TODO_FILE)
+    local IDS=`echo "$TODOS" | awk '{print $1;}'`
+    for ID in $IDS; do
+        if [ $ID -gt $BIGGEST_ID ]; then
+            BIGGEST_ID=$ID;
+        fi
+    done;
+    local NEW_ID=$(( BIGGEST_ID + 1 ))
+    echo "$NEW_ID OPEN $MSG" >> $TODO_FILE 
+}
+
+complete_todo() {
+    echo $*
+    local TODO_ID=$1
+    local TODOS=$(cat $TODO_FILE)
+
+    local IDS=`echo "$TODOS" | awk '{print $1;}'`
+    local ARR_INDEX=1
+    for ID in $IDS; do
+        if [ "$ID" == "$TODO_ID" ]; then
+            sed -i "${ARR_INDEX}s/OPEN/CLOSED/" $TODO_FILE
+        fi;
+        ARR_INDEX=$((ARR_INDEX + 1));
+    done;
+}
+
+reopen_todo() {
+    local TODO_ID=$1
+    local TODOS=$(cat $TODO_FILE)
+
+    local IDS=`echo "$TODOS" | awk '{print $1;}'`
+    local ARR_INDEX=1
+    for ID in $IDS; do
+        if [ "$ID" == "$TODO_ID" ]; then
+            sed -i "${ARR_INDEX}s/CLOSED/OPEN/" $TODO_FILE
+        fi;
+        ARR_INDEX=$((ARR_INDEX + 1))
+    done;
+}
+
+remove_todo() {
+    local TODO_ID=$1;
+    local TODOS=$(cat $TODO_FILE)
+
+    local IDS=`echo "$TODOS" | awk '{print $1;}'`
+    for ID in $IDS; do
+        if [ "$ID" == "$TODO_ID" ]; then
+            sed -i /$ID/d $TODO_FILE
+        fi;
+    done;
+}
+
+clear_todos() {
+    truncate -s 0 $TODO_FILE
+}
+
+
+
+print_help() {
+    echo "Print help"
+}
+
+FIRST_ARG=$1
+
+## If no flag is given create TODO with given arg
+if [ ! ${FIRST_ARG:0:1} == "-" ]; then
+    create_todo "$1"
+    exit 1;
+fi
+
+## Check provided flags add call relevant function
+while getopts "d:o:r:ch*:" flag; do
+    case "${flag}" in
+        d) complete_todo "${OPTARG}" ;;
+        o) reopen_todo "${OPTARG}" ;;
+        r) remove_todo "${OPTARG}" ;;
+        c) clear_todos ;;
+        h) print_help ;;
+        *) print_help ;;
+    esac
+done

@@ -1,0 +1,35 @@
+#! /usr/bin/bash
+
+TODO_FILE=$HOME/scripts/todos.txt
+
+print_todos() {
+    if [ -s $TODO_FILE ]; then
+    echo "`cat $TODO_FILE | sed s/OPEN/[" "]/ | sed s/CLOSED/[X]/`";
+    else
+        echo "You have nothing TODO"
+    fi;
+
+}
+
+watch_todos() {
+    echo $TODO_FILE | entr todos 
+}
+
+print_help() {
+    echo "Help me"
+}
+
+## Print the TODOs if no argument is passed
+if [ $# -eq 0 ]; then
+    clear;
+    print_todos;
+    exit 1
+fi
+
+while getopts "wh*" flag; do
+    case "${flag}" in
+        w) watch_todos ;;
+        h) print_help ;;
+        *) print_help ;;
+    esac
+done
