@@ -1,6 +1,7 @@
 #! /usr/bin/bash
 
-TODO_FILE=$HOME/scripts/todos.txt
+TODO_FILE=$SCRIPTS/todos.txt
+
 
 print_todos() {
     if [ -s $TODO_FILE ]; then

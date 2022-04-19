@@ -1,0 +1,13 @@
+#! /usr/bin/bash
+
+if [ -z $* ]; then
+    echo "Name of script required"
+fi
+
+FILE="$SCRIPTS/$1"
+
+touch $FILE
+echo "#! /usr/bin/bash" >> $FILE
+chmod +x $FILE 
+
+nvim $FILE
