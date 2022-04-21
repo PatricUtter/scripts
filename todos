@@ -17,7 +17,11 @@ watch_todos() {
 }
 
 print_help() {
-    echo "Help me"
+    echo "Prints todos"
+    echo " "
+    echo "options:"
+    echo "-h --help            show this help message"
+    echo "-w --watch           watch todos for changes"
 }
 
 ## Print the TODOs if no argument is passed
@@ -27,10 +31,8 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-while getopts "wh*" flag; do
-    case "${flag}" in
-        w) watch_todos ;;
-        h) print_help ;;
-        *) print_help ;;
-    esac
-done
+case "$1" in
+    -w|--watch) watch_todos ;;
+    -h|--help) print_help ;;
+    *) echo "invalid flag" ; print_help ;;
+esac

@@ -25,43 +25,48 @@ create_todo() {
 }
 
 complete_todo() {
-    echo $*
-    local TODO_ID=$1
+    local ARG_IDS=$*
     local TODOS=$(cat $TODO_FILE)
 
-    local IDS=`echo "$TODOS" | awk '{print $1;}'`
-    local ARR_INDEX=1
-    for ID in $IDS; do
-        if [ "$ID" == "$TODO_ID" ]; then
-            sed -i "${ARR_INDEX}s/OPEN/CLOSED/" $TODO_FILE
-        fi;
-        ARR_INDEX=$((ARR_INDEX + 1));
+    local TODO_IDS=`echo "$TODOS" | awk '{print $1;}'`
+    for ARG_ID in $ARG_IDS; do
+        local ARR_INDEX=1
+        for ID in $TODO_IDS; do
+            if [ "$ID" == "$ARG_ID" ]; then
+                sed -i "${ARR_INDEX}s/OPEN/CLOSED/" $TODO_FILE
+            fi;
+            ARR_INDEX=$((ARR_INDEX + 1));
+        done;
     done;
 }
 
 reopen_todo() {
-    local TODO_ID=$1
+    local ARG_IDS=$*
     local TODOS=$(cat $TODO_FILE)
 
-    local IDS=`echo "$TODOS" | awk '{print $1;}'`
-    local ARR_INDEX=1
-    for ID in $IDS; do
-        if [ "$ID" == "$TODO_ID" ]; then
-            sed -i "${ARR_INDEX}s/CLOSED/OPEN/" $TODO_FILE
-        fi;
-        ARR_INDEX=$((ARR_INDEX + 1))
+    local TODO_IDS=`echo "$TODOS" | awk '{print $1;}'`
+    for ARG_ID in $ARG_IDS; do
+        local ARR_INDEX=1
+        for ID in $TODO_IDS; do
+            if [ "$ID" == "$ARG_ID" ]; then
+                sed -i "${ARR_INDEX}s/CLOSED/OPEN/" $TODO_FILE
+            fi;
+            ARR_INDEX=$((ARR_INDEX + 1))
+        done;
     done;
 }
 
 remove_todo() {
-    local TODO_ID=$1;
+    local ARG_IDS=$*
     local TODOS=$(cat $TODO_FILE)
 
-    local IDS=`echo "$TODOS" | awk '{print $1;}'`
-    for ID in $IDS; do
-        if [ "$ID" == "$TODO_ID" ]; then
-            sed -i /$ID/d $TODO_FILE
-        fi;
+    local TODO_IDS=`echo "$TODOS" | awk '{print $1;}'`
+    for ARG_ID in $ARG_IDS; do
+        for ID in $TODO_IDS; do
+            if [ "$ID" == "$ARG_ID" ]; then
+                sed -i /$ID/d $TODO_FILE
+            fi;
+        done;
     done;
 }
 
@@ -72,7 +77,17 @@ clear_todos() {
 
 
 print_help() {
-    echo "Print help"
+    echo "Edit list of todos"
+    echo " "
+    echo 'Called without args it will create a TODO -> todo "do something"'
+    echo "TODOs can be view using the command 'todos'" 
+    echo " "
+    echo "options:"
+    echo "-d --done [IDS]      marks one or more TODOs as done"
+    echo "-o --open [IDS]      reopens one or more close TODOs"
+    echo "-r --remove [IDS]    removes one or more TODOs from the list"
+    echo "-c --clear           clear the list of TODOs"
+    echo "-h --help            prints this help message"
 }
 
 FIRST_ARG=$1
@@ -84,13 +99,30 @@ if [ ! ${FIRST_ARG:0:1} == "-" ]; then
 fi
 
 ## Check provided flags add call relevant function
-while getopts "d:o:r:ch*:" flag; do
-    case "${flag}" in
-        d) complete_todo "${OPTARG}" ;;
-        o) reopen_todo "${OPTARG}" ;;
-        r) remove_todo "${OPTARG}" ;;
-        c) clear_todos ;;
-        h) print_help ;;
-        *) print_help ;;
-    esac
-done
+case "$1" in
+    -d|--done)
+        ALL_ARGS="$*"
+        ID_LIST=`echo "$ALL_ARGS" | cut -d' ' -f2-`
+        complete_todo "$ID_LIST"
+        ;;
+    -o|--open)
+        ALL_ARGS="$*"
+        ID_LIST=`echo "$ALL_ARGS" | cut -d' ' -f2-`
+        reopen_todo "$ID_LIST"
+        ;;
+    -r|--remove)
+        ALL_ARGS="$*"
+        ID_LIST=`echo "$ALL_ARGS" | cut -d' ' -f2-`
+        remove_todo "$ID_LIST"
+        ;;
+    -c|--clear)
+        clear_todos
+        ;;
+    -h|--help)
+       print_help 
+        ;;
+    *)
+      echo "Invalid flag"
+      print_help
+      ;;
+esac
