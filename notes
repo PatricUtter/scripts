@@ -1,0 +1,24 @@
+#! /usr/bin/bash
+
+TODAY=`date '+%Y-%m-%d'`
+
+NOTE_NAME="$TODAY.md"
+
+NOTES_PATH="$HOME/notes"
+
+cd "$NOTES_PATH"
+
+if [ -f "$NOTES_PATH/$NOTE_NAME" ]; then
+    nvim "$NOTES_PATH/$NOTE_NAME" 
+else
+    touch "$NOTE_NAME"
+    echo "## Todays notes ($TODAY)
+
+
+#### TODOs
+
+
+#### notes
+    " >> "$NOTE_NAME"
+    nvim "$NOTES_PATH/$NOTE_NAME"
+fi
