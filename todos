@@ -13,6 +13,10 @@ print_todos() {
 }
 
 watch_todos() {
+    if ! command -v entr &> /dev/null
+    then 
+        echo "watch requires entr to run -> http://eradman.com/entrproject/"
+    fi
     echo $TODO_FILE | entr todos 
 }
 
