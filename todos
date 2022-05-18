@@ -1,6 +1,6 @@
 #! /usr/bin/bash
 
-TODO_FILE=$SCRIPTS/todos.txt
+TODO_FILE=$HOME/todos.txt
 
 
 print_todos() {
