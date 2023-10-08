@@ -80,7 +80,7 @@ print_help() {
     echo "Edit list of todos"
     echo " "
     echo 'Called without args it will create a TODO -> todo "do something"'
-    echo "TODOs can be view using the command 'todos'" 
+    echo "TODOs can be viewed using the command 'todos'" 
     echo " "
     echo "options:"
     echo "-d --done [IDS]      marks one or more TODOs as done"
